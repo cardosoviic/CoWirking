@@ -2,6 +2,10 @@ package view;
 
 import javax.swing.JDialog;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.Connection;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
@@ -11,6 +15,9 @@ import javax.swing.JPasswordField;
 import java.awt.Rectangle;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
+
+import model.DAO;
+
 import java.awt.Cursor;
 import javax.swing.ImageIcon;
 import java.awt.Color;
@@ -19,7 +26,15 @@ public final class Login extends JDialog {
 	private JTextField inputLogin;
 	private JPasswordField inputSenha;
 
+
 	public Login() {
+		
+		addWindowListener(new WindowAdapter(){
+			public void windowActivated(WindowEvent e) {
+				statusConexaoBanco();
+			}
+		});
+		
 		getContentPane().setBackground(new Color(255, 255, 255));
 		setResizable(false);
 		getContentPane().setFont(new Font("Trebuchet MS", Font.PLAIN, 11));
@@ -58,12 +73,40 @@ public final class Login extends JDialog {
 		tituloLogin.setBounds(10, 72, 486, 17);
 		getContentPane().add(tituloLogin);
 		
-		JLabel imgDatabase = new JLabel("");
-		imgDatabase.setIcon(new ImageIcon(Login.class.getResource("/img/databaseOff.png")));
-		imgDatabase.setBounds(21, 265, 53, 65);
-		getContentPane().add(imgDatabase);
+		imgDatabase_1 = new JLabel("");
+		imgDatabase_1.setIcon(new ImageIcon(Login.class.getResource("/img/databaseOff.png")));
+		imgDatabase_1.setBounds(21, 265, 53, 65);
+		getContentPane().add(imgDatabase_1);
 	}
-
+	
+	DAO dao = new DAO();
+	
+	private JLabel imgDatabase_1;
+	private void statusConexaoBanco() {
+		try {
+			Connection conexaoBanco = dao.conectar();
+			
+			if (conexaoBanco == null) {
+				//Escolher a imagem 
+				imgDatabase_1.setIcon(new ImageIcon (Login.class.getResource("/img/databaseOff.png")));
+				
+			}
+			
+			else {
+				//Trocar a imagem se houver conexão 
+				imgDatabase_1.setIcon(new ImageIcon (Login.class.getResource("/img/databaseOn.png")));
+				
+			}
+			conexaoBanco.close();
+		}
+		
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		
+		
+	}
+	
 	public static void main(String[] args) {
 
 		EventQueue.invokeLater(new Runnable() {
