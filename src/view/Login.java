@@ -2,9 +2,13 @@ package view;
 
 import javax.swing.JDialog;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -67,6 +71,13 @@ public final class Login extends JDialog {
 		btnLogin.setBounds(208, 233, 89, 23);
 		getContentPane().add(btnLogin);
 		
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				logar();
+			}
+		});
+		
+		
 		JLabel tituloLogin = new JLabel("Acessar conta");
 		tituloLogin.setHorizontalAlignment(SwingConstants.CENTER);
 		tituloLogin.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -105,6 +116,41 @@ public final class Login extends JDialog {
 		}
 		
 		
+		
+	}
+	
+	
+	private void logar() {
+		String read = "select * from funcionario where login=? and senha=md5(?)";
+		
+		try {
+			//Estabelecer a conexão 
+			Connection conexaoBanco = dao.conectar();
+			
+			//Preparar a execução do script SQL 
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(read);
+			
+			//Atribuir valores de login e senha 
+			//Substituir as interrogações ? ? pelo conteúdo da caixa dee texto (input)
+			executarSQL.setString(1, inputLogin.getText());
+			executarSQL.setString(2, inputSenha.getText());
+			
+			//Executar os comandos SQL e de acordo  com o resultado liberar os recursos na tela
+			ResultSet resultadoExecucao = executarSQL.executeQuery();
+			
+			//Validação do funcionário (autenticação)
+			//resultadoExcucao.next() significa que o login e a senha existem, ou seja, correspondem
+			
+			if (resultadoExecucao.next()) {
+				System.out.println("Você logou!");
+			}
+	}
+	
+		
+		catch (Exception e ) {
+	    	System.out.println(e);	
+		
+		}
 	}
 	
 	public static void main(String[] args) {
