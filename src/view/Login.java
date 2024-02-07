@@ -20,6 +20,8 @@ import java.awt.Rectangle;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+import com.mysql.cj.protocol.x.SyncFlushDeflaterOutputStream;
+
 import model.DAO;
 
 import java.awt.Cursor;
@@ -142,7 +144,13 @@ public final class Login extends JDialog {
 			//resultadoExcucao.next() significa que o login e a senha existem, ou seja, correspondem
 			
 			if (resultadoExecucao.next()) {
-				System.out.println("Você logou!");
+				Home home = new Home ();
+				home.setVisible(true);
+			
+			}
+			
+			else {
+				System.out.println("Login e/ou senha inválidos");
 			}
 	}
 	
