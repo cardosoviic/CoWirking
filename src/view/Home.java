@@ -26,6 +26,13 @@ public class Home extends JDialog {
 		btnUser.setIcon(new ImageIcon(Home.class.getResource("/img/user.png")));
 		btnUser.setBounds(57, 63, 98, 105);
 		getContentPane().add(btnUser);
+		btnUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Funcionarios func = new Funcionarios();
+				func.setVisible(true);
+			}
+		});
+		
 		
 		JButton btnRoom = new JButton("");
 		btnRoom.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -33,10 +40,19 @@ public class Home extends JDialog {
 		btnRoom.setBounds(207, 63, 89, 105);
 		getContentPane().add(btnRoom);
 		
+		btnRoom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Salas sala = new Salas();
+				sala.setVisible(true);
+			}
+		});
+		
 		JButton btnReserve = new JButton("");
 		btnReserve.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnReserve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				Reservas reserva = new Reservas();
+				reserva.setVisible(true);
 			}
 		});
 		btnReserve.setIcon(new ImageIcon(Home.class.getResource("/img/reserve.png")));

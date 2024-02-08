@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import java.awt.EventQueue;
@@ -125,6 +126,21 @@ public final class Login extends JDialog {
 	private void logar() {
 		String read = "select * from funcionario where login=? and senha=md5(?)";
 		
+		//Validação do login do usuário
+		if (inputLogin.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Login do usuário obrigatório!");
+			inputLogin.requestFocus();
+			
+		}
+		
+		//Validação da senha do usuário 
+		else if (inputSenha.getPassword().length == 0) {
+			JOptionPane.showMessageDialog(null, "Senha do usuário obrigatório!");
+			inputSenha.requestFocus();
+		}
+		
+		else {
+		
 		try {
 			//Estabelecer a conexão 
 			Connection conexaoBanco = dao.conectar();
@@ -146,12 +162,23 @@ public final class Login extends JDialog {
 			if (resultadoExecucao.next()) {
 				Home home = new Home ();
 				home.setVisible(true);
+				
+				
+				//Fechar a janel de Login assim que a janela Home abrir (automaticamente)
+				dispose();
 			
 			}
 			
 			else {
-				System.out.println("Login e/ou senha inválidos");
+			    //Criar um alerta (pop-up) que informe ao usuário que o login e/ou senha estão inválidos 
+				JOptionPane.showMessageDialog(null, "Login e/ou senha inválido(s)!");
+				inputLogin.setText(null);
+				inputSenha.setText(null);
+				inputLogin.requestFocus();
+				
 			}
+			
+			conexaoBanco.close();
 	}
 	
 		
@@ -160,6 +187,7 @@ public final class Login extends JDialog {
 		
 		}
 	}
+}
 	
 	public static void main(String[] args) {
 
