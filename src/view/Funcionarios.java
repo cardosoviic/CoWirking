@@ -9,6 +9,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,6 +32,7 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import java.awt.Color;
 
 public class Funcionarios extends JDialog {
 	private JTextField inputNome;
@@ -68,7 +71,7 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(perfilFunc);
 		
 		inputNome = new JTextField();
-		inputNome.setBounds(74, 55, 479, 20);
+		inputNome.setBounds(74, 55, 440, 20);
 		getContentPane().add(inputNome);
 		inputNome.setColumns(10);
 		
@@ -93,6 +96,7 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(inputSenha);
 		
 		imgCreate = new JButton("");
+		imgCreate.setBackground(new Color(240, 240, 240));
 		imgCreate.setBorderPainted(false);
 		imgCreate.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgCreate.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/create.png")));
@@ -109,6 +113,7 @@ public class Funcionarios extends JDialog {
 		
 		
 		imgUpdate = new JButton("");
+		imgUpdate.setBackground(new Color(240, 240, 240));
 		imgUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
@@ -120,6 +125,7 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(imgUpdate);
 		
 		imgDelete = new JButton("");
+		imgDelete.setBackground(new Color(240, 240, 240));
 		imgDelete.setBorderPainted(false);
 		imgDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgDelete.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/delete.png")));
@@ -132,11 +138,25 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(inputPerfil);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(74, 75, 479, 83);
+		scrollPane.setBounds(74, 75, 440, 83);
 		getContentPane().add(scrollPane);
 		
 		tblFuncionarios = new JTable();
 		scrollPane.setViewportView(tblFuncionarios);
+		
+		JButton btnPesquisar = new JButton("");
+		btnPesquisar.setBackground(new Color(240, 240, 240));
+		btnPesquisar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnPesquisar.setBorderPainted(false);
+		btnPesquisar.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/search.png")));
+		btnPesquisar.setBounds(536, 52, 57, 23);
+		getContentPane().add(btnPesquisar);
+		
+		tblFuncionarios.addMouseListener(new MouseAdapter() {
+			public void mouseClicked (MouseEvent e) {
+				setarCaixasTexto();
+			}
+		});
 
 	}
 	
@@ -241,8 +261,43 @@ public class Funcionarios extends JDialog {
 		
 		//Criar uma variável para receber a linha da tabela 
 		int setarLinha = tblFuncionarios.getSelectedRow();
+		
+		inputNome.setText(tblFuncionarios.getModel().getValueAt(setarLinha, 1).toString());
+		//inputEmail.setText(tblFuncionarios.getModel().getValueAt(setarLinha,2).toString());
 	}
 
+	//Criar método para buscar funcionário pelo botão pesquisar 
+	
+	private void btnBuscarFuncionario() {
+		String readBtn = "select * from funcionario where nomeFunc = ?;";
+		 
+		try {
+			//Estabelecer a conexão 
+			Connection conexaoBanco = dao.conectar();
+			
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(readBtn);
+			
+			executarSQL.setString(1, inputNome.getText());
+			
+			//Executar o comando SQL e exibir o resultado no formulário funcionário (todos os seus dados)
+			ResultSet resultadoExecucao = executarSQL.executeQuery();
+			
+			if (resultadoExecucao.next()) {
+				//Preencher os campos do formulário
+				inputLogin.setText(resultadoExecucao.getString(3));
+				inputSenha.setText(resultadoExecucao.getString(4));
+				inputPerfil.setSelectedItem(resultadoExecucao.getString(5));
+			
+			}
+			
+		}
+		
+		catch (Exception e) {
+			System.out.println(e);
+		}
+		
+	}
+	
 
     public void limparCampos() {
 	 inputNome.setText(null);
