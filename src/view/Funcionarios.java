@@ -55,19 +55,19 @@ public class Funcionarios extends JDialog {
 		getContentPane().add(nomeFunc);
 		
 		JLabel loginFunc = new JLabel("Login:");
-		loginFunc.setBounds(24, 184, 46, 14);
+		loginFunc.setBounds(24, 233, 46, 14);
 		getContentPane().add(loginFunc);
 		
 		JLabel senhaFunc = new JLabel("Senha:");
-		senhaFunc.setBounds(309, 184, 46, 14);
+		senhaFunc.setBounds(309, 233, 46, 14);
 		getContentPane().add(senhaFunc);
 		
 		JLabel emailFunc = new JLabel("E-mail:");
-		emailFunc.setBounds(309, 233, 46, 14);
+		emailFunc.setBounds(309, 275, 46, 14);
 		getContentPane().add(emailFunc);
 		
 		JLabel perfilFunc = new JLabel("Perfil:");
-		perfilFunc.setBounds(24, 233, 46, 14);
+		perfilFunc.setBounds(24, 275, 36, 14);
 		getContentPane().add(perfilFunc);
 		
 		inputNome = new JTextField();
@@ -83,16 +83,16 @@ public class Funcionarios extends JDialog {
 		
 		inputEmail = new JTextField();
 		inputEmail.setColumns(10);
-		inputEmail.setBounds(365, 230, 200, 20);
+		inputEmail.setBounds(354, 271, 200, 23);
 		getContentPane().add(inputEmail);
 		
 		inputLogin = new JTextField();
 		inputLogin.setColumns(10);
-		inputLogin.setBounds(74, 181, 200, 20);
+		inputLogin.setBounds(74, 229, 200, 23);
 		getContentPane().add(inputLogin);
 		
 		inputSenha = new JPasswordField();
-		inputSenha.setBounds(365, 181, 200, 20);
+		inputSenha.setBounds(354, 229, 200, 22);
 		getContentPane().add(inputSenha);
 		
 		imgCreate = new JButton("");
@@ -100,7 +100,7 @@ public class Funcionarios extends JDialog {
 		imgCreate.setBorderPainted(false);
 		imgCreate.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgCreate.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/create.png")));
-		imgCreate.setBounds(348, 290, 65, 54);
+		imgCreate.setBounds(386, 305, 65, 54);
 		getContentPane().add(imgCreate);
 		
 		
@@ -121,20 +121,32 @@ public class Funcionarios extends JDialog {
 		imgUpdate.setBorderPainted(false);
 		imgUpdate.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgUpdate.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/update.png")));
-		imgUpdate.setBounds(423, 290, 65, 54);
+		imgUpdate.setBounds(461, 305, 65, 54);
 		getContentPane().add(imgUpdate);
+		
+		imgUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				atualizarFuncionario();
+			}
+		});
 		
 		imgDelete = new JButton("");
 		imgDelete.setBackground(new Color(240, 240, 240));
 		imgDelete.setBorderPainted(false);
 		imgDelete.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		imgDelete.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/delete.png")));
-		imgDelete.setBounds(500, 290, 65, 54);
+		imgDelete.setBounds(536, 305, 65, 54);
 		getContentPane().add(imgDelete);
+		
+		imgDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				deletarFuncionario();
+			}
+		});
 		
 		inputPerfil = new JComboBox();
 		inputPerfil.setModel(new DefaultComboBoxModel(new String[] {"", "Administrador", "Gerência", "Atendimento", "Suporte"}));
-		inputPerfil.setBounds(74, 229, 200, 22);
+		inputPerfil.setBounds(74, 271, 200, 22);
 		getContentPane().add(inputPerfil);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -149,8 +161,27 @@ public class Funcionarios extends JDialog {
 		btnPesquisar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnPesquisar.setBorderPainted(false);
 		btnPesquisar.setIcon(new ImageIcon(Funcionarios.class.getResource("/img/search.png")));
-		btnPesquisar.setBounds(536, 52, 57, 23);
+		btnPesquisar.setBounds(284, 179, 57, 23);
 		getContentPane().add(btnPesquisar);
+		
+		inputID = new JTextField();
+		inputID.setEnabled(false);
+		inputID.setBounds(74, 180, 200, 22);
+		getContentPane().add(inputID);
+		inputID.setColumns(10);
+		
+		JLabel IDFunc = new JLabel("ID:");
+		IDFunc.setBounds(45, 184, 25, 14);
+		getContentPane().add(IDFunc);
+		
+		btnPesquisar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				btnBuscarFuncionario();
+			}
+		});
+		
+		
+		
 		
 		tblFuncionarios.addMouseListener(new MouseAdapter() {
 			public void mouseClicked (MouseEvent e) {
@@ -164,6 +195,7 @@ public class Funcionarios extends JDialog {
 	DAO dao = new DAO();
 	private JComboBox inputPerfil;
 	private JTable tblFuncionarios;
+	private JTextField inputID;
 	
 	private void adicionarFuncionario() {
 		String create = "insert into funcionario (nomeFunc, login, senha, perfil, email) values (?, ?, md5(?), ?, ?);";
@@ -263,13 +295,15 @@ public class Funcionarios extends JDialog {
 		int setarLinha = tblFuncionarios.getSelectedRow();
 		
 		inputNome.setText(tblFuncionarios.getModel().getValueAt(setarLinha, 1).toString());
+		inputID.setText(tblFuncionarios.getModel().getValueAt(setarLinha, 0).toString());
+		
 		//inputEmail.setText(tblFuncionarios.getModel().getValueAt(setarLinha,2).toString());
 	}
 
 	//Criar método para buscar funcionário pelo botão pesquisar 
 	
 	private void btnBuscarFuncionario() {
-		String readBtn = "select * from funcionario where nomeFunc = ?;";
+		String readBtn = "select * from funcionario where idFuncionario = ?;";
 		 
 		try {
 			//Estabelecer a conexão 
@@ -277,7 +311,7 @@ public class Funcionarios extends JDialog {
 			
 			PreparedStatement executarSQL = conexaoBanco.prepareStatement(readBtn);
 			
-			executarSQL.setString(1, inputNome.getText());
+			executarSQL.setString(1, inputID.getText());
 			
 			//Executar o comando SQL e exibir o resultado no formulário funcionário (todos os seus dados)
 			ResultSet resultadoExecucao = executarSQL.executeQuery();
@@ -287,6 +321,7 @@ public class Funcionarios extends JDialog {
 				inputLogin.setText(resultadoExecucao.getString(3));
 				inputSenha.setText(resultadoExecucao.getString(4));
 				inputPerfil.setSelectedItem(resultadoExecucao.getString(5));
+				inputEmail.setText(resultadoExecucao.getString(6));
 			
 			}
 			
@@ -297,6 +332,72 @@ public class Funcionarios extends JDialog {
 		}
 		
 	}
+	
+	private void deletarFuncionario() {
+		String updateBtn = "delete from funcionario where idFuncionario = ?;";
+		
+		try {
+			//Estabelecer a conexão
+			Connection conexaoBanco = dao.conectar();
+			
+			//Preparar a execução do comando SQL
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(updateBtn);
+			
+			//Substituir
+			
+			executarSQL.setString(1, inputID.getText());
+			
+			executarSQL.executeUpdate();
+
+			conexaoBanco.close();
+
+			JOptionPane.showMessageDialog(null, "Usuário excluído com sucesso!");
+
+			limparCampos();
+			
+			
+		}
+		catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	private void atualizarFuncionario() {
+		String updateBtn = "update funcionario set nomeFunc = ?, login = ?, senha = md5(?), perfil = ?, email = ?  where idFuncionario = ?;";
+		
+		try {
+			//Estabelecer a conexão
+			Connection conexaoBanco = dao.conectar();
+			
+			//Preparar a execução do comando SQL
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(updateBtn);
+			
+			//Substituir
+			executarSQL.setString(1, inputNome.getText());
+			executarSQL.setString(2, inputLogin.getText());
+			executarSQL.setString(3, inputSenha.getText());
+
+			executarSQL.setString(4, inputPerfil.getSelectedItem().toString());
+
+			executarSQL.setString(5, inputEmail.getText());
+			executarSQL.setString(6, inputID.getText());
+			
+			executarSQL.executeUpdate();
+
+			conexaoBanco.close();
+
+			JOptionPane.showMessageDialog(null, "Usuário editado com sucesso!");
+
+			limparCampos();
+				
+		}
+		
+		catch (Exception e) {
+		System.out.println(e);	
+		}
+	}
+	
+	
 	
 
     public void limparCampos() {
