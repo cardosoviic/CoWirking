@@ -56,11 +56,11 @@ public class Salas extends JDialog {
 		getContentPane().add(codSala);
 
 		JLabel andarSala = new JLabel("Andar:");
-		andarSala.setBounds(328, 222, 36, 14);
+		andarSala.setBounds(324, 222, 46, 14);
 		getContentPane().add(andarSala);
 
 		JLabel ocupSala = new JLabel("Ocupação:");
-		ocupSala.setBounds(306, 267, 58, 14);
+		ocupSala.setBounds(305, 267, 65, 14);
 		getContentPane().add(ocupSala);
 
 		JLabel numSala = new JLabel("Número:");
@@ -69,7 +69,7 @@ public class Salas extends JDialog {
 
 		inputOcup = new JTextField();
 		inputOcup.setColumns(10);
-		inputOcup.setBounds(367, 263, 200, 23);
+		inputOcup.setBounds(374, 263, 200, 23);
 		getContentPane().add(inputOcup);
 
 		imgCreate = new JButton("");
@@ -82,7 +82,7 @@ public class Salas extends JDialog {
 
 		imgCreate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				adicionarFuncionario();
+				adicionarSala();
 			}
 		});
 
@@ -100,7 +100,7 @@ public class Salas extends JDialog {
 
 		imgUpdate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				atualizarFuncionario();
+				atualizarSala();
 			}
 		});
 
@@ -114,12 +114,12 @@ public class Salas extends JDialog {
 
 		imgDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				deletarFuncionario();
+				deletarSala();
 			}
 		});
 
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(74, 75, 440, 83);
+		scrollPane.setBounds(77, 72, 440, 83);
 		getContentPane().add(scrollPane);
 
 		tblSalas = new JTable();
@@ -130,34 +130,33 @@ public class Salas extends JDialog {
 		btnPesquisar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnPesquisar.setBorderPainted(false);
 		btnPesquisar.setIcon(new ImageIcon(Salas.class.getResource("/img/search.png")));
-		btnPesquisar.setBounds(284, 179, 57, 23);
+		btnPesquisar.setBounds(477, 41, 57, 23);
 		getContentPane().add(btnPesquisar);
 
-		inputID = new JTextField();
-		inputID.setEnabled(false);
-		inputID.setBounds(74, 180, 200, 22);
-		getContentPane().add(inputID);
-		inputID.setColumns(10);
-
-		JLabel IDSala = new JLabel("ID:");
-		IDSala.setBounds(45, 184, 25, 14);
-		getContentPane().add(IDSala);
-		
 		inputCategoria = new JComboBox();
-		inputCategoria.setModel(new DefaultComboBoxModel(new String[] {"", "Sala de reunião ", "Sala de confêrencia ", "Espaço de eventos ", "Escritório privado "}));
-		inputCategoria.setBounds(74, 52, 293, 22);
+
+		inputCategoria.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				buscarSalaNaTabela();
+			}
+		});
+
+		inputCategoria.setModel(new DefaultComboBoxModel(new String[] { "", "Sala de reunião ", "Sala de confêrencia ",
+				"Espaço de eventos ", "Escritório privado " }));
+		inputCategoria.setBounds(77, 52, 293, 22);
 		getContentPane().add(inputCategoria);
-		
+
 		inputCod = new JComboBox();
-		inputCod.setModel(new DefaultComboBoxModel(new String[] {"", "REU", "CONF", "EVENT", "PRIV"}));
+		inputCod.setModel(new DefaultComboBoxModel(new String[] { "", "REU", "CONF", "EVENT", "PRIV" }));
 		inputCod.setBounds(84, 218, 200, 22);
 		getContentPane().add(inputCod);
-		
+
 		inputAndar = new JComboBox();
-		inputAndar.setModel(new DefaultComboBoxModel(new String[] {"", "Subsolo", "Térreo", "1º Andar", "2º Andar", "3º Andar"}));
-		inputAndar.setBounds(367, 218, 200, 22);
+		inputAndar.setModel(
+				new DefaultComboBoxModel(new String[] { "", "Subsolo", "Térreo", "1º Andar", "2º Andar", "3º Andar" }));
+		inputAndar.setBounds(374, 218, 200, 22);
 		getContentPane().add(inputAndar);
-		
+
 		inputNum = new JTextField();
 		inputNum.setBounds(84, 263, 200, 23);
 		getContentPane().add(inputNum);
@@ -165,7 +164,7 @@ public class Salas extends JDialog {
 
 		btnPesquisar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				btnBuscarFuncionario();
+				btnBuscarSala();
 			}
 		});
 
@@ -180,15 +179,41 @@ public class Salas extends JDialog {
 	// Criar um objeto da classe DAO para estabelecer conexão com banco
 	DAO dao = new DAO();
 	private JTable tblSalas;
-	private JTextField inputID;
 	private JComboBox inputCategoria;
 	private JComboBox inputCod;
 	private JComboBox inputAndar;
 	private JTextField inputNum;
 
-	/* private void adicionarFuncionario() {
-		String create = "insert into funcionario (nomeFunc, login, senha, perfil, email) values (?, ?, md5(?), ?, ?);";
+	private void adicionarSala() {
+		String create = "insert into salas (andarSala, numeroSala, tipoSala, codigoSala, ocupacaoSala)"
+				+ "values (?, ?, ?, ?, ?);";
 
+		if (inputCategoria.getSelectedItem().equals("")) {
+			JOptionPane.showMessageDialog(null, "Categoria da sala obrigatório!");
+			inputCategoria.requestFocus();
+		}
+
+		else if (inputCod.getSelectedItem().equals("")) {
+			JOptionPane.showMessageDialog(null, "Código da sala obrigatório!");
+			inputCod.requestFocus();
+		}
+
+		else if (inputAndar.getSelectedItem().equals("")) {
+			JOptionPane.showMessageDialog(null, "Andar da sala obrigatória!");
+			inputAndar.requestFocus();
+		}
+
+		else if (inputNum.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Número da sala obrigatória!");
+			inputNum.requestFocus();
+		}
+
+		else if (inputOcup.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Ocupação máxima obrigatória!");
+			inputOcup.requestFocus();
+		}
+
+		else {
 
 			try {
 				// Estabelecer a conexão
@@ -199,18 +224,16 @@ public class Salas extends JDialog {
 
 				// Substituir os pontos de interrogação pelo conteúdo das caixas de texto
 				// (inputs)
-				executarSQL.setString(1, inputNome.getText());
-				executarSQL.setString(2, inputLogin.getText());
-				executarSQL.setString(3, inputSenha.getText());
-
-				executarSQL.setString(4, inputPerfil.getSelectedItem().toString());
-
+				executarSQL.setString(1, inputAndar.getSelectedItem().toString());
+				executarSQL.setString(2, inputNum.getText());
+				executarSQL.setString(3, inputCategoria.getSelectedItem().toString());
+				executarSQL.setString(4, inputCod.getSelectedItem().toString());
 				executarSQL.setString(5, inputOcup.getText());
 
-				// Executar os comandos SQL e inserir o funcionario no banco de dados
+				// Executar os comandos SQL e inserir a sala no banco de dados
 				executarSQL.executeUpdate();
 
-				JOptionPane.showMessageDialog(null, "Usuário cadastrado com sucesso!");
+				JOptionPane.showMessageDialog(null, "Sala cadastrada com sucesso!");
 
 				limparCampos();
 
@@ -227,9 +250,181 @@ public class Salas extends JDialog {
 
 			}
 
-		} 
-		
-*/
+		}
+
+	}
+
+	private void buscarSalaNaTabela() {
+
+		String readTabela = "select tipoSala as Categoria, andarSala as Andar, numeroSala as Número from salas where tipoSala = ?;";
+
+		try {
+			// Estabelecer a conexão
+			Connection conexaoBanco = dao.conectar();
+
+			// Preparar a execução dos comandos SQL
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(readTabela);
+
+			// Substituir o ? pelo conteúdo da caixa de texto
+			executarSQL.setString(1, inputCategoria.getSelectedItem().toString());
+
+			// Executar o comando SQL e exibir o resultado na tabela
+
+			ResultSet resultadoExecucao = executarSQL.executeQuery();
+
+			// Exibir o resultado na tabela
+			tblSalas.setModel(DbUtils.resultSetToTableModel(resultadoExecucao));
+
+			conexaoBanco.close();
+
+		}
+
+		catch (Exception e) {
+			System.out.println(e);
+		}
+
+	}
+
+	private void setarCaixasTexto() {
+
+		// Criar uma variável para receber a linha da tabela
+		int setarLinha = tblSalas.getSelectedRow();
+
+		inputNum.setText(tblSalas.getModel().getValueAt(setarLinha, 2).toString());
+
+	}
+
+	// Criar método para buscar funcionário pelo botão pesquisar
+
+	private void btnBuscarSala() {
+		String readBtn = "select * from salas where numeroSala = ?;";
+
+		try {
+			// Estabelecer a conexão
+			Connection conexaoBanco = dao.conectar();
+
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(readBtn);
+
+			executarSQL.setString(1, inputNum.getText());
+
+			// Executar o comando SQL e exibir o resultado no formulário funcionário (todos
+			// os seus dados)
+			ResultSet resultadoExecucao = executarSQL.executeQuery();
+
+			if (resultadoExecucao.next()) {
+				// Preencher os campos do formulário
+
+				inputAndar.setSelectedItem(resultadoExecucao.getString(2));
+				inputCod.setSelectedItem(resultadoExecucao.getString(5));
+				inputOcup.setText(resultadoExecucao.getString(6));
+
+			}
+
+		}
+
+		catch (Exception e) {
+			System.out.println(e);
+		}
+
+	}
+
+	private void deletarSala() {
+		String updateBtn = "delete from salas where numeroSala = ?;";
+
+		try {
+			// Estabelecer a conexão
+			Connection conexaoBanco = dao.conectar();
+
+			// Preparar a execução do comando SQL
+			PreparedStatement executarSQL = conexaoBanco.prepareStatement(updateBtn);
+
+			// Substituir
+
+			executarSQL.setString(1, inputNum.getText());
+
+			executarSQL.executeUpdate();
+
+			conexaoBanco.close();
+
+			JOptionPane.showMessageDialog(null, "Sala excluída com sucesso!");
+
+			limparCampos();
+
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	private void atualizarSala() {
+		String updateBtn = "update salas set andarSala = ?, tipoSala = ?, codigoSala = ?, ocupacaoSala = ? where numeroSala = ? ;";
+
+		if (inputCategoria.getSelectedItem().equals("")) {
+			JOptionPane.showMessageDialog(null, "Categoria da sala obrigatório!");
+			inputCategoria.requestFocus();
+		}
+
+		else if (inputCod.getSelectedItem().equals("")) {
+			JOptionPane.showMessageDialog(null, "Código da sala obrigatório!");
+			inputCod.requestFocus();
+		}
+
+		else if (inputAndar.getSelectedItem().equals("")) {
+			JOptionPane.showMessageDialog(null, "Andar da sala obrigatória!");
+			inputAndar.requestFocus();
+		}
+
+		else if (inputNum.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Número da sala obrigatória!");
+			inputNum.requestFocus();
+		}
+
+		else if (inputOcup.getText().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Ocupação máxima obrigatória!");
+			inputOcup.requestFocus();
+		}
+
+		else {
+
+			try {
+				// Estabelecer a conexão
+				Connection conexaoBanco = dao.conectar();
+
+				// Preparar a execução do comando SQL
+				PreparedStatement executarSQL = conexaoBanco.prepareStatement(updateBtn);
+
+				// Substituir
+				executarSQL.setString(1, inputAndar.getSelectedItem().toString());
+				executarSQL.setString(2, inputCategoria.getSelectedItem().toString());
+				executarSQL.setString(3, inputCod.getSelectedItem().toString());
+				executarSQL.setString(4, inputOcup.getText());
+				executarSQL.setString(5, inputNum.getText());
+
+				executarSQL.executeUpdate();
+
+				conexaoBanco.close();
+
+				JOptionPane.showMessageDialog(null, "Sala editada com sucesso!");
+
+				limparCampos();
+
+			}
+
+			catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+
+	}
+
+	public void limparCampos() {
+		inputCategoria.setSelectedIndex(-1);
+		inputCod.setSelectedIndex(-1);
+		inputAndar.setSelectedIndex(-1);
+		inputNum.setText(null);
+		inputOcup.setText(null);
+		inputCategoria.requestFocus();
+
+	}
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -243,123 +438,5 @@ public class Salas extends JDialog {
 				}
 			}
 		});
-	}
-
-	private void setarCaixasTexto() {
-
-		// Criar uma variável para receber a linha da tabela
-		int setarLinha = tblSalas.getSelectedRow();
-
-		inputNome.setText(tblSalas.getModel().getValueAt(setarLinha, 1).toString());
-		inputID.setText(tblSalas.getModel().getValueAt(setarLinha, 0).toString());
-
-		// inputEmail.setText(tblSalas.getModel().getValueAt(setarLinha,2).toString());
-	}
-
-	// Criar método para buscar funcionário pelo botão pesquisar
-
-	private void btnBuscarFuncionario() {
-		String readBtn = "select * from funcionario where idFuncionario = ?;";
-
-		try {
-			// Estabelecer a conexão
-			Connection conexaoBanco = dao.conectar();
-
-			PreparedStatement executarSQL = conexaoBanco.prepareStatement(readBtn);
-
-			executarSQL.setString(1, inputID.getText());
-
-			// Executar o comando SQL e exibir o resultado no formulário funcionário (todos
-			// os seus dados)
-			ResultSet resultadoExecucao = executarSQL.executeQuery();
-
-			if (resultadoExecucao.next()) {
-				// Preencher os campos do formulário
-				inputLogin.setText(resultadoExecucao.getString(3));
-				inputSenha.setText(resultadoExecucao.getString(4));
-				inputPerfil.setSelectedItem(resultadoExecucao.getString(5));
-				inputOcup.setText(resultadoExecucao.getString(6));
-
-			}
-
-		}
-
-		catch (Exception e) {
-			System.out.println(e);
-		}
-
-	}
-
-	private void deletarFuncionario() {
-		String updateBtn = "delete from funcionario where idFuncionario = ?;";
-
-		try {
-			// Estabelecer a conexão
-			Connection conexaoBanco = dao.conectar();
-
-			// Preparar a execução do comando SQL
-			PreparedStatement executarSQL = conexaoBanco.prepareStatement(updateBtn);
-
-			// Substituir
-
-			executarSQL.setString(1, inputID.getText());
-
-			executarSQL.executeUpdate();
-
-			conexaoBanco.close();
-
-			JOptionPane.showMessageDialog(null, "Usuário excluído com sucesso!");
-
-			limparCampos();
-
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
-	private void atualizarFuncionario() {
-		String updateBtn = "update funcionario set nomeFunc = ?, login = ?, senha = md5(?), perfil = ?, email = ?  where idFuncionario = ?;";
-
-			try {
-				// Estabelecer a conexão
-				Connection conexaoBanco = dao.conectar();
-
-				// Preparar a execução do comando SQL
-				PreparedStatement executarSQL = conexaoBanco.prepareStatement(updateBtn);
-
-				// Substituir
-				executarSQL.setString(1, inputNome.getText());
-				executarSQL.setString(2, inputLogin.getText());
-				executarSQL.setString(3, inputSenha.getText());
-
-				executarSQL.setString(4, inputPerfil.getSelectedItem().toString());
-
-				executarSQL.setString(5, inputOcup.getText());
-				executarSQL.setString(6, inputID.getText());
-
-				executarSQL.executeUpdate();
-
-				conexaoBanco.close();
-
-				JOptionPane.showMessageDialog(null, "Usuário editado com sucesso!");
-
-				limparCampos();
-
-			}
-
-			catch (Exception e) {
-				System.out.println(e);
-			}
-		}
-	
-
-	public void limparCampos() {
-		inputNome.setText(null);
-		inputLogin.setText(null);
-		inputSenha.setText(null);
-		inputOcup.setText(null);
-		inputPerfil.setSelectedItem(null);
-		inputNome.requestFocus();
-
 	}
 }
